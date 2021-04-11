@@ -10,16 +10,8 @@
 //For this project, create a DUT model (High level non-synthesizable SV is OK).  
 //Divide up the work, and test all aspects of the coding including disparity, code generation, CRC generation, and CRC insertion.
 
-module dut (
-	input clk,
-	input reset,
-	input pushin,
-	input [8:0] datain,
-	input startin,
-	output pushout,
-	output [9:0] dataout,
-	output startout
-);
+module dut (dut_intf.dut m);
+
 
 
 
