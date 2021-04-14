@@ -12,9 +12,21 @@
 
 module dut (dut_intf.dut m);
 
+/* 		input clk,
+		input reset,
+		input pushin,
+		input [8:0] datain,
+		input startin,
+		output pushout,
+		output [9:0] dataout,
+		output startout
+ */
+ 
+crc32 c();
+ebtb e();
 
-
-
+//we receive signal and data from sequence, then send packet to the 8b10b?
+//or we generate packet from the seqience?
 
 
 
