@@ -12,10 +12,10 @@ interface dut_intf(input reg clk, input reg reset);
 		input clk,
 		input reset,
 		input pushin,
-		input [8:0] datain,
+		input datain,
 		input startin,
 		output pushout,
-		output [9:0] dataout,
+		output dataout,
 		output startout
 	);
 

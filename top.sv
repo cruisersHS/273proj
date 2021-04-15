@@ -12,10 +12,13 @@
 `timescale 1ns/10ps
 
 `include "dut_intf.sv"
-package proj
+`include "dut.sv"
+`include "crc32.sv"
+`include "ebtb.sv"
+package proj;
 import uvm_pkg::*;
 
-`include "dut.sv"
+
 
 
 endpackage : proj

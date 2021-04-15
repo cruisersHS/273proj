@@ -11,8 +11,7 @@
 //Divide up the work, and test all aspects of the coding including disparity, code generation, CRC generation, and CRC insertion.
 
 module dut (dut_intf.dut m);
-
-/* 		input clk,
+/* 		input clk,		//interface signals
 		input reset,
 		input pushin,
 		input [8:0] datain,
@@ -21,9 +20,24 @@ module dut (dut_intf.dut m);
 		output [9:0] dataout,
 		output startout
  */
- 
-crc32 c();
-ebtb e();
+
+wire			k;
+wire			disparity;
+wire	[7:0]	eb;
+reg		[9:0]	tb;
+
+reg		[7:0]	crc_in;
+wire	[7:0]	crc_out;
+wire			crc_in_valid;
+
+assign k = m.datain[8];
+assign eb = m.datain[7:0];
+assign m.dataout = tb;
+
+crc32 c(m.clk, m.reset, crc_in, crc_in_valid, crc_out);
+ebtb e(m.clk, m.reset, k, eb, tb, disparity);
+
+
 
 //we receive signal and data from sequence, then send packet to the 8b10b?
 //or we generate packet from the seqience?
