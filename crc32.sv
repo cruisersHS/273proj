@@ -17,7 +17,7 @@ parameter init = 32'hffffffff;
 
 reg		[31:0]	crc_table;
 reg		[31:0]	crc_reg;			//CRC register
-reg		[7:0]	index;			//lookup table index (0 - 255)
+wire		[7:0]	index;			//lookup table index (0 - 255)
 
 //start output when crc_in_valid is high
 //in DUT, set crc_in_valid high at 1 clk after the 4th K.28.1
@@ -36,10 +36,7 @@ end
 assign crc_out = crc_reg ^ init;
 
 //index
-always_comb begin
-	if(reset) index = 0;
-	else index = crc_in ^ crc_reg[7:0];
-end
+assign index = crc_in ^ crc_reg[7:0];
 
 //crc_table
 //check https://rosettacode.org/wiki/CRC-32#C for algorithm
