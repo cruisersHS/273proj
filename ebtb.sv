@@ -93,14 +93,14 @@ always_comb begin
 	lbout = 0;
 	if(!k) begin		//D
 		case(mbin)
-			3'b000: lbout = curr_state ? 4'b0100 : 4'b1011;			//D.x.0
+			3'b000: lbout = !curr_state ? 4'b0100 : 4'b1011;			//D.x.0
 			3'b001: lbout = 4'b1001;								//D.x.1
 			3'b010: lbout = 4'b0101;								//D.x.2
-			3'b011: lbout = curr_state ? 4'b0011 : 4'b1100;			//D.x.3
-			3'b100: lbout = curr_state ? 4'b0010 : 4'b1101;			//D.x.4
+			3'b011: lbout = !curr_state ? 4'b0011 : 4'b1100;			//D.x.3
+			3'b100: lbout = !curr_state ? 4'b0010 : 4'b1101;			//D.x.4
 			3'b101: lbout = 4'b1010;								//D.x.5
 			3'b110: lbout = 4'b0110;								//D.x.6
-			3'b111: lbout = curr_state ? 4'b0001 : 4'b1110;			//D.x.P7+
+			3'b111: lbout = !curr_state ? 4'b0001 : 4'b1110;			//D.x.P7+
 			
 		endcase
 	end else begin		//K
@@ -123,11 +123,11 @@ always_comb begin
 	next_state = 0;
 	case(curr_state)
 		0: begin	//rd-, if is disparity neutral, stay rd-
-			if(balance == 3'b010 || balance == 3'b001) next_state = 0;
+			if(balance == 3'b010 || balance == 3'b100) next_state = 0;		//-2 is an error case
 			else next_state = 1;
 		end
 		1: begin	//rd+, if is disparity neutral, stay rd+
-			if(balance == 3'b010 || balance == 3'b100) next_state = 1;
+			if(balance == 3'b010 || balance == 3'b001) next_state = 1;		//+2 is an error case
 			else next_state = 0;
 		end
 	endcase
