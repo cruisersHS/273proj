@@ -79,7 +79,40 @@ always_comb begin
 		endcase
 	end else begin		//K
 		case(lbin)
+			5'b11100: mbout = curr_state ? 6'b110000 : 6'b001111;	//K.28
+			5'b10111: mbout = curr_state ? 6'b000101 : 6'b111010;	//K.23
+			5'b11011: mbout = curr_state ? 6'b001001 : 6'b110110;	//K.27 (not used)
+			5'b11101: mbout = curr_state ? 6'b010001 : 6'b101110;	//K.29 (not used)
+			5'b11110: mbout = curr_state ? 6'b100001 : 6'b011110;	//K.30 (not used)
+		endcase
+	end
+end
+
+//lbout 3b/4b table
+always_comb begin
+	lbout = 0;
+	if(!k) begin		//D
+		case(mbin)
+			3'b000: lbout = curr_state ? 4'b0100 : 4'b1011;			//D.x.0
+			3'b001: lbout = 4'b1001;								//D.x.1
+			3'b010: lbout = 4'b0101;								//D.x.2
+			3'b011: lbout = curr_state ? 4'b0011 : 4'b1100;			//D.x.3
+			3'b100: lbout = curr_state ? 4'b0010 : 4'b1101;			//D.x.4
+			3'b101: lbout = 4'b1010;								//D.x.5
+			3'b110: lbout = 4'b0110;								//D.x.6
+			3'b111: lbout = curr_state ? 4'b0001 : 4'b1110;			//D.x.P7+
 			
+		endcase
+	end else begin		//K
+		case(mbin)
+			3'b000: lbout = curr_state ? 4'b1011 : 4'b0100;			//K.x.0
+			3'b001: lbout = curr_state ? 4'b0110 : 4'b1001;			//K.x.1+
+			3'b010: lbout = curr_state ? 4'b1010 : 4'b0101;			//K.x.2
+			3'b011: lbout = curr_state ? 4'b1100 : 4'b0011;			//K.x.3
+			3'b100: lbout = curr_state ? 4'b1101 : 4'b0010;			//K.x.4
+			3'b101: lbout = curr_state ? 4'b0101 : 4'b1010;			//K.x.5+
+			3'b110: lbout = curr_state ? 4'b1001 : 4'b0110;			//K.x.6
+			3'b111: lbout = curr_state ? 4'b0111 : 4'b1000;			//K.x.7++
 		endcase
 	end
 end
