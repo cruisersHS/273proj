@@ -17,10 +17,20 @@ reg 	[5:0]	mbout;	//6b
 reg		[2:0]	balance;			//100: -2, 010: 0, 001: +2
 reg				curr_state, next_state;		//0:rd-, 1:rd+
 reg		[4:0]	ones;	
+reg		PA;
 
 assign	lbin = eb[4:0];
 assign	mbin = eb[7:5];
 assign	tb = {mbout, lbout};
+assign	k_err = (k && lbin != 5'd28 && lbin != 5'd23 && 
+			lbin != 5'd27 && lbin != 5'd29 && lbin != 5'd30) ? 1 : 0;		//28 23 27 29 30
+
+//PA	P7:0, A7:1
+always_comb begin
+	PA = 0;
+	if(!curr_state && (lbin == 17 || lbin == 18 || lbin == 20)) PA = 1;
+	else if(curr_state && (lbin == 11 || lbin == 13 || lbin == 14)) PA = 1; 
+end
 
 //rd-: 0;	rd+: 1
 assign rd = curr_state;
@@ -100,8 +110,10 @@ always_comb begin
 			3'b100: lbout = !curr_state ? 4'b0010 : 4'b1101;			//D.x.4
 			3'b101: lbout = 4'b1010;								//D.x.5
 			3'b110: lbout = 4'b0110;								//D.x.6
-			3'b111: lbout = !curr_state ? 4'b0001 : 4'b1110;			//D.x.P7+
-			
+			3'b111: begin
+				if(PA) lbout = !curr_state ? 4'b1000 : 4'b0111;		//D.x.A7
+				else lbout = !curr_state ? 4'b0001 : 4'b1110;		//D.x.P7
+			end
 		endcase
 	end else begin		//K
 		case(mbin)
