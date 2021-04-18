@@ -22,12 +22,13 @@ module dut (dut_intf.dut m);
  */
 
 wire			k;
-wire			disparity;
+wire			rd;
+wire			k_err;
 wire	[7:0]	eb;
 reg		[9:0]	tb;
 
 reg		[7:0]	crc_in;
-wire	[7:0]	crc_out;
+wire	[32:0]	crc_out;
 wire			crc_in_valid;
 
 assign k = m.datain[8];
@@ -35,7 +36,7 @@ assign eb = m.datain[7:0];
 assign m.dataout = tb;
 
 crc32 c(m.clk, m.reset, crc_in, crc_in_valid, crc_out);
-ebtb e(m.clk, m.reset, k, eb, tb, disparity);
+ebtb e(m.clk, m.reset, k, eb, tb, rd, k_err);
 
 
 
