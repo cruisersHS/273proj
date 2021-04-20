@@ -13,15 +13,17 @@ wire	[4:0]	lbin;	//5b
 wire	[2:0]	mbin;	//3b
 reg 	[3:0]	lbout;	//4b
 reg 	[5:0]	mbout;	//6b
+reg		[9:0]	dataout;
 
 reg		[2:0]	balance;			//100: -2, 010: 0, 001: +2
 reg				curr_state, next_state;		//0:rd-, 1:rd+
 reg		[4:0]	ones;	
+reg		[4:0]	ones_6b;
 reg		PA;
 
 assign	lbin = eb[4:0];
 assign	mbin = eb[7:5];
-assign	tb = {mbout, lbout};
+assign	tb = dataout;
 assign	k_err = (k && lbin != 5'd28 && lbin != 5'd23 && 
 			lbin != 5'd27 && lbin != 5'd29 && lbin != 5'd30) ? 1 : 0;		//28 23 27 29 30
 
@@ -39,7 +41,16 @@ assign rd = curr_state;
 //+2: 6 ones 4 zeros
 //-2: 4 ones 6 zeros
 always_comb begin
-	ones = tb[0] + tb[1] + tb[2] + tb[3] + tb[4] + tb[5] + tb[6] + tb[7] + tb[8] + tb[9];
+	ones = dataout[0] + dataout[1] + dataout[2] + dataout[3] + dataout[4]
+	 + dataout[5] + dataout[6] + dataout[7] + dataout[8] + dataout[9];
+end
+
+always_comb begin
+	ones_6b = dataout[4] + dataout[5] + dataout[6] + dataout[7] + dataout[8] + dataout[9];
+end
+
+always_comb begin
+	dataout = {mbout, lbout};
 end
 
 //balance (disparity)
@@ -103,16 +114,30 @@ always_comb begin
 	lbout = 0;
 	if(!k) begin		//D
 		case(mbin)
-			3'b000: lbout = !curr_state ? 4'b0100 : 4'b1011;			//D.x.0
+			3'b000: begin
+					if(ones_6b != 3) lbout = !curr_state ? 4'b0100 : 4'b1011;
+					else lbout = curr_state ? 4'b0100 : 4'b1011;
+				end			//D.x.0
 			3'b001: lbout = 4'b1001;								//D.x.1
 			3'b010: lbout = 4'b0101;								//D.x.2
-			3'b011: lbout = !curr_state ? 4'b0011 : 4'b1100;			//D.x.3
-			3'b100: lbout = !curr_state ? 4'b0010 : 4'b1101;			//D.x.4
+			3'b011: begin
+					if(ones_6b != 3) lbout = !curr_state ? 4'b0011 : 4'b1100;
+					else lbout = curr_state ? 4'b0011 : 4'b1100;			//D.x.3
+				end
+			3'b100: begin
+					if(ones_6b != 3) lbout = !curr_state ? 4'b0010 : 4'b1101;
+					else lbout = curr_state ? 4'b0010 : 4'b1101;			//D.x.4
+				end
 			3'b101: lbout = 4'b1010;								//D.x.5
 			3'b110: lbout = 4'b0110;								//D.x.6
 			3'b111: begin
-				if(PA) lbout = !curr_state ? 4'b1000 : 4'b0111;		//D.x.A7
-				else lbout = !curr_state ? 4'b0001 : 4'b1110;		//D.x.P7
+				if(PA) begin
+					if(ones_6b != 3) lbout = !curr_state ? 4'b1000 : 4'b0111;
+					else lbout = curr_state ? 4'b1000 : 4'b0111;		//D.x.A7
+				end else begin 
+					if(ones_6b != 3) lbout = !curr_state ? 4'b0001 : 4'b1110;
+					else lbout = curr_state ? 4'b0001 : 4'b1110;		//D.x.P7
+				end
 			end
 		endcase
 	end else begin		//K

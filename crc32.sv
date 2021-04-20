@@ -19,8 +19,8 @@ reg		[31:0]	crc_table;
 reg		[31:0]	crc_reg;			//CRC register
 wire		[7:0]	index;			//lookup table index (0 - 255)
 
-//start output when crc_in_valid is high
-//in DUT, set crc_in_valid high at 1 clk after the 4th K.28.1
+//start output one cycle after crc_in_valid is high
+//in DUT, set crc_in_valid high at the 4th K.28.1
 //keep the crc_in_valid high until the end of the data
 
 //crc_reg

@@ -21,31 +21,148 @@ module dut (dut_intf.dut m);
 		output startout
  */
 
-wire			k;
+
+reg 			k;
 wire			rd;
 wire			k_err;
-wire	[7:0]	eb;
+wire	[7:0]	d8b;
+reg		[7:0]	eb;		//the actual 8bit data packet we are putting in to the crc
 reg		[9:0]	tb;
 
-reg		[7:0]	crc_in;
+wire	[7:0]	crc_in;
 wire	[32:0]	crc_out;
 wire			crc_in_valid;
 
-assign k = m.datain[8];
-assign eb = m.datain[7:0];
+reg		[2:0]	k_count;
+reg		[2:0]	crc_index;
+
+reg 			pushout, startout;
+
+//assign k = m.datain[8];
+assign d8b = m.datain[7:0];
 assign m.dataout = tb;
+assign m.startout = startout;
+assign m.pushout = pushout;
+assign crc_in = m.datain[7:0];
 
 crc32 c(m.clk, m.reset, crc_in, crc_in_valid, crc_out);
 ebtb e(m.clk, m.reset, k, eb, tb, rd, k_err);
 
+//input: k281, k281, k281, k281, d.x.y..., k285
+//output: k281, k281, k281, k281, d.x.y..., k237, crc(l), crc, crc, crc(h), k285 
 
+typedef union packed{
+	bit [31:0] d;
+	bit [3:0][0:7] b;
+} crcout;
 
-//we receive signal and data from sequence, then send packet to the 8b10b?
-//or we generate packet from the seqience?
+crcout crc_out_reg;
 
+enum [2:0] {
+	IDLE,
+	K281,
+	DATA,
+	K_END,
+	CRC,
+	ENDP
+} curr_state, next_state;
 
+//assign m.pushout = (m.pushin || curr_state != IDLE) ? 1 : 0;
 
+//pushout, startout
+always_ff @(posedge m.clk or posedge m.reset) begin
+	if(m.reset) begin
+		pushout <= 0;
+		startout <= 0;
+	end else begin
+		if(m.pushin || curr_state != IDLE) begin
+			if(curr_state == ENDP) pushout <= 0;
+			else pushout <= 1;
+			if(m.startin) startout <= 1;
+			else startout <= 0;
+		end
+	end
+end
 
+//crc_index
+always_ff @(posedge m.clk or posedge m.reset) begin
+	if(m.reset) crc_index <= 0;
+	else begin
+		if(curr_state == CRC) crc_index <= crc_index + 1;
+		else crc_index <= 0;
+	end
+end
+
+//k_count
+always_ff @(posedge m.clk or posedge m.reset) begin
+	if(m.reset) k_count <= 0;
+	else begin
+		if(m.pushin && k &&(curr_state == IDLE || next_state == K281)) k_count <= k_count + 1;
+		else k_count <= 0;
+	end
+end
+
+//k
+always_comb begin
+	k = 0;
+	if(curr_state == ENDP) k = 1;
+	else k = m.datain[8];
+end
+
+//eb
+always_comb begin
+	eb = d8b;
+	case(curr_state)
+		DATA: eb = d8b;
+		K_END: eb = 8'b11110111;		//K23.7
+		CRC: eb = crc_out_reg.b[crc_index];
+		ENDP: eb = 8'b10111100;							//K28.5
+	endcase
+end
+
+//crc_in_valid
+assign crc_in_valid = (next_state == DATA) ? 1 : 0;
+
+//crc_out_reg.d
+always_ff @(posedge m.clk or posedge m.reset) begin
+	if(m.reset) crc_out_reg.d <= 32'h0;
+	else begin
+		if(curr_state == DATA) crc_out_reg.d <= crc_out;
+		else crc_out_reg.d <= crc_out_reg.d;
+	end
+end
+
+//next_state
+always_comb begin
+	next_state = IDLE;
+	case(curr_state)
+		IDLE: begin
+			if(m.pushin) next_state = K281;
+			else next_state = IDLE; 
+		end
+		K281: begin
+			if(k_count == 4) next_state = DATA;
+			else next_state = K281;
+		end
+		DATA: begin
+			if(k && (d8b == 8'b10111100)) begin next_state = K_END; end		//K28.5
+			else next_state = DATA;
+		end
+		K_END: next_state = CRC;
+		CRC: begin
+			if(crc_index == 3) next_state = ENDP;
+			else next_state = CRC;
+			//$finish;
+		end
+		ENDP: next_state = IDLE;
+	endcase
+end
+
+//curr_state
+always_ff @(posedge m.clk or posedge m.reset) begin
+	if(m.reset) curr_state <= IDLE;
+	else curr_state <= next_state;
+end
 
 
 endmodule : dut
