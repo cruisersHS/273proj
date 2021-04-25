@@ -32,28 +32,28 @@ class scoreboard_A extends uvm_scoreboard;
 			
 			//Verification State Machine (Work in Progress)
 			case(CS)
-				state_Reset : 	if((rec_A == 10'b0011111001) ||(rec_A == 10'1100000110))begin
+				state_Reset : 	if((rec_A == 10'b0011111001) ||(rec_A == 10'b1100000110))begin
 									NS = state_K1;
 								end 
 								else begin
 									`uvm_error("Signal Order", "Error: Expected first K.28.1")	
 									NS = state_Reset;	
 								end
-				state_K1 : 		if((rec_A == 10'b0011111001) ||(rec_A == 10'1100000110))begin
+				state_K1 : 		if((rec_A == 10'b0011111001) ||(rec_A == 10'b1100000110))begin
 									NS = state_K2;
 								end 
 								else begin
 									`uvm_error("Signal Order", "Error: Expected second K.28.1")	
 									NS = state_Reset;	
 								end
-				state_K2 : 		if((rec_A == 10'b0011111001) ||(rec_A == 10'1100000110))begin
+				state_K2 : 		if((rec_A == 10'b0011111001) ||(rec_A == 10'b1100000110))begin
 									NS = state_K3;
 								end 
 								else begin
 									`uvm_error("Signal Order", "Error: Expected third K.28.1")	
 									NS = state_Reset;	
 								end
-				state_K3 : 		if((rec_A == 10'b0011111001) ||(rec_A == 10'1100000110))begin
+				state_K3 : 		if((rec_A == 10'b0011111001) ||(rec_A == 10'b1100000110))begin
 									NS = state_K4;
 								end 
 								else begin
