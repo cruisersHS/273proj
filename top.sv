@@ -19,15 +19,40 @@ package proj;
 import uvm_pkg::*;
 
 
+`include "si.sv"
+`include "mimsg.sv"
+`include "seq.sv"
+`include "seqr.sv"
+`include "drv.sv"
+
+`include "ssd.sv"
 
 
 endpackage : proj
 
+import uvm_pkg::*;
+
 module top ();
 
-reg clk, reset;
-dut_intf intf(clk, reset);
+reg clk;
+dut_intf intf(clk);
 
+initial begin
+	uvm_config_db #(virtual dut_intf)::set(null, "daron", "intf" , intf);
+	run_test("ssd");
+end
+
+initial begin
+	clk=0;
+	forever begin
+		 #5 clk=~clk;
+	end
+end
+
+initial begin
+	$dumpfile("grey.vcd");
+	$dumpvars(9,top);
+end
 
 dut d(intf.dut);
 

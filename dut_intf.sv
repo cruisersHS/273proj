@@ -1,5 +1,6 @@
 //interface of dut
-interface dut_intf(input reg clk, input reg reset);
+interface dut_intf(input reg clk);
+	reg reset;
 	reg pushin;
 	reg [8:0] datain;
 	reg startin;

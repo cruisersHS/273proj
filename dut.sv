@@ -30,13 +30,13 @@ reg		[7:0]	eb;		//the actual 8bit data packet we are putting in to the crc
 reg		[9:0]	tb;
 
 wire	[7:0]	crc_in;
-wire	[32:0]	crc_out;
+wire	[31:0]	crc_out;
 wire			crc_in_valid;
 
 reg		[2:0]	k_count;
 reg		[2:0]	crc_index;
 
-reg 			pushout, startout;
+wire 			pushout, startout;
 
 //assign k = m.datain[8];
 assign d8b = m.datain[7:0];
@@ -70,19 +70,8 @@ enum [2:0] {
 //assign m.pushout = (m.pushin || curr_state != IDLE) ? 1 : 0;
 
 //pushout, startout
-always_ff @(posedge m.clk or posedge m.reset) begin
-	if(m.reset) begin
-		pushout <= 0;
-		startout <= 0;
-	end else begin
-		if(m.pushin || curr_state != IDLE) begin
-			if(curr_state == ENDP) pushout <= 0;
-			else pushout <= 1;
-			if(m.startin) startout <= 1;
-			else startout <= 0;
-		end
-	end
-end
+assign pushout = m.pushin || (curr_state != IDLE);
+assign startout = (curr_state == IDLE) && (next_state == K281);
 
 //crc_index
 always_ff @(posedge m.clk or posedge m.reset) begin
@@ -145,7 +134,7 @@ always_comb begin
 			else next_state = K281;
 		end
 		DATA: begin
-			if(k && (d8b == 8'b10111100)) begin next_state = K_END; end		//K28.5
+			if(d8b == 8'b10111100) begin next_state = K_END; end		//K28.5
 			else next_state = DATA;
 		end
 		K_END: next_state = CRC;
