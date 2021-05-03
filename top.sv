@@ -24,10 +24,10 @@ import uvm_pkg::*;
 `include "seq.sv"
 `include "seqr.sv"
 `include "drv.sv"
+`include "monitor_A.sv"
+`include "scoreboard_A.sv"
 
 `include "ssd.sv"
-
-
 endpackage : proj
 
 import uvm_pkg::*;
