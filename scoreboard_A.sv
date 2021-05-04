@@ -130,7 +130,7 @@ class scoreboard_A extends uvm_scoreboard;
 		D6x_valid = 0;
 		Dx4_valid = 0;
 
-		for (int i = 0; i<44;i++) begin
+		for (int i = 0; i<46;i++) begin
 			if (code[9:4] == Valid_Data6_Codes[i]) begin
 				D6x_valid = 1;
 				break;

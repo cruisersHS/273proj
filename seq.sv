@@ -58,7 +58,7 @@ virtual task body();
 	sii=si::type_id::create("sequence_Item_sdd");
 	//************packet*************//
 	repeat(5) Reset();
-	repeat(10) send_packet();
+	repeat(60) send_packet();
 	//*******************************//
 endtask: body
 
