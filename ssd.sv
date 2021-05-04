@@ -7,6 +7,7 @@ seqr sqr;
 drv  driver;
 monitor_A monA;
 scoreboard_A sbA;
+scoreboard_B sbB;
 
 function new(string name="ssd",uvm_component parent=null);
 	super.new(name,parent);
@@ -17,6 +18,7 @@ function void build_phase(uvm_phase phase);
 	driver = drv::type_id::create("driver",this);
 	
 	sbA = scoreboard_A::type_id::create("sbA",this);
+	sbB = scoreboard_B::type_id::create("sbB",this);
 	monA= monitor_A::type_id::create("monA",this);
 endfunction: build_phase
 
@@ -24,6 +26,7 @@ function void connect_phase(uvm_phase phase);
 	driver.seq_item_port.connect(sqr.seq_item_export);
 
 	monA.port_A.connect(sbA.tlma_fifo_A.analysis_export);
+	monA.port_A.connect(sbB.tlma_fifo_B.analysis_export);
 endfunction: connect_phase
 
 task run_phase(uvm_phase phase);

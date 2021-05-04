@@ -26,7 +26,7 @@ import uvm_pkg::*;
 `include "drv.sv"
 `include "monitor_A.sv"
 `include "scoreboard_A.sv"
-
+`include "scoreboard_B.sv"
 `include "ssd.sv"
 endpackage : proj
 
