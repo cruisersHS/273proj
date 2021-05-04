@@ -39,7 +39,7 @@ task K281();
 endtask: K281
 
 task Data(si m);
-	xx.datain=mr.data;
+	xx.datain={1'b0, mr.data};
 	xx.pushin=1;
 	@(posedge xx.clk) xx.datain=9'b111111111;
 endtask : Data

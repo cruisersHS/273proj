@@ -36,7 +36,7 @@ wire			crc_in_valid;
 reg		[2:0]	k_count;
 reg		[2:0]	crc_index;
 
-wire 			pushout, startout;
+reg 			pushout, startout;
 
 //assign k = m.datain[8];
 assign d8b = m.datain[7:0];
@@ -69,9 +69,24 @@ enum [2:0] {
 
 //assign m.pushout = (m.pushin || curr_state != IDLE) ? 1 : 0;
 
+reg k_d;
+reg [7:0] eb_d;
+wire pushout_d, startout_d;
+
 //pushout, startout
-assign pushout = m.pushin || (curr_state != IDLE);
-assign startout = (curr_state == IDLE) && (next_state == K281);
+assign pushout_d = m.pushin || (curr_state != IDLE);
+assign startout_d = (curr_state == IDLE) && (next_state == K281);
+
+always_ff @(posedge m.clk or posedge m.reset) begin
+	if(m.reset) begin
+		pushout <= 0;
+		startout <= 0;
+	end else begin
+		pushout <= pushout_d;
+		startout <= startout_d;
+	end
+end
+
 
 //crc_index
 always_ff @(posedge m.clk or posedge m.reset) begin
@@ -93,20 +108,38 @@ end
 
 //k
 always_comb begin
-	k = 0;
-	if(curr_state == ENDP) k = 1;
-	else k = m.datain[8];
+	k_d = k;
+	if(curr_state == ENDP || (curr_state == DATA && next_state == CRC)) k_d = 1;
+	else if(curr_state == DATA) k_d = 0;
+	else k_d = m.datain[8];
+end
+
+always_ff @(posedge m.clk or posedge m.reset) begin
+	if(m.reset) k <= 0;
+	else k <= k_d;
 end
 
 //eb
 always_comb begin
-	eb = d8b;
+	eb_d = eb;
 	case(curr_state)
-		DATA: eb = d8b;
-		K_END: eb = 8'b11110111;		//K23.7
-		CRC: eb = crc_out_reg.b[crc_index];
-		ENDP: eb = 8'b10111100;							//K28.5
+		DATA: begin 
+			if (next_state != CRC) eb_d = d8b;
+			else eb_d = 8'b11110111;		//K23.7
+		end
+		//K_END: eb = 8'b11110111;		//K23.7
+		CRC: eb_d = crc_out_reg.b[crc_index];
+		ENDP: eb_d = 8'b10111100;							//K28.5
+		default: eb_d = d8b;
 	endcase
+end
+
+//k_input, pushout, startout
+
+
+always_ff @(posedge m.clk or posedge m.reset) begin
+	if(m.reset) eb <= 0;
+	else eb <= eb_d;
 end
 
 //crc_in_valid
@@ -130,14 +163,14 @@ always_comb begin
 			else next_state = IDLE; 
 		end
 		K281: begin
-			if(k_count == 4) next_state = DATA;
+			if(k_count == 3) next_state = DATA;
 			else next_state = K281;
 		end
 		DATA: begin
-			if(d8b == 8'b10111100) begin next_state = K_END; end		//K28.5
+			if(d8b == 8'b10111100) begin next_state = CRC; end		//K28.5
 			else next_state = DATA;
 		end
-		K_END: next_state = CRC;
+		//K_END: next_state = CRC;
 		CRC: begin
 			if(crc_index == 3) next_state = ENDP;
 			else next_state = CRC;

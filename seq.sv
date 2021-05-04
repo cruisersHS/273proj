@@ -41,10 +41,8 @@ virtual task Wait();
 	finish_item(sii);
 endtask : Wait
 
-virtual task body();
-	sii=si::type_id::create("sequence_Item_sdd");
-	//************packet*************//
-	repeat(5) Reset();
+virtual task send_packet();
+	//Reset();
 	repeat(4) Push281();
 	sii.randomize() with {datalength>=4;};
 	repeat(sii.datalength) begin
@@ -54,6 +52,13 @@ virtual task body();
 	Push285();
 	sii.randomize() with {sii.delay>10;};
 	repeat(sii.delay) Wait();
+endtask : send_packet
+
+virtual task body();
+	sii=si::type_id::create("sequence_Item_sdd");
+	//************packet*************//
+	repeat(5) Reset();
+	repeat(10) send_packet();
 	//*******************************//
 endtask: body
 

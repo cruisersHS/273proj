@@ -12,7 +12,7 @@ class si extends uvm_sequence_item;
 `uvm_object_utils(si)
 
 Dcmd cmd;
-rand logic [8:0] data;
+rand logic [7:0] data;
 //rand logic [8:0] datain;
 rand logic [4:0] delay;
 rand logic [3:0] datalength;
