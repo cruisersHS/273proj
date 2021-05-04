@@ -43,28 +43,28 @@ class scoreboard_A extends uvm_scoreboard;
 									NS = state_K2;
 								end 
 								else begin
-									`uvm_error("Signal Order (K1)", "Error: Expected second K.28.1")	
+									`uvm_error("Signal Order (K1)", $sformatf("Error: Expected second K.28.1, recieved %b", rec_A))	
 									NS = state_Reset;	
 								end
 				state_K2 : 		if((rec_A == 10'b0011111001) ||(rec_A == 10'b1100000110))begin
 									NS = state_K3;
 								end 
 								else begin
-									`uvm_error("Signal Order (K2)", "Error: Expected third K.28.1")	
+									`uvm_error("Signal Order (K2)", $sformatf("Error: Expected third K.28.1, recieved %b", rec_A))	
 									NS = state_Reset;	
 								end
 				state_K3 : 		if((rec_A == 10'b0011111001) ||(rec_A == 10'b1100000110))begin
 									NS = state_K4;
 								end 
 								else begin
-									`uvm_error("Signal Order (K3)", "Error: Expected fourth K.28.1")	
+									`uvm_error("Signal Order (K3)", $sformatf("Error: Expected fourth K.28.1, recieved %b", rec_A))	
 									NS = state_Reset;	
 								end	
 				state_K4 : 		if(is_valid_D(rec_A))begin
 									NS = state_D1;
 								end 
 								else begin
-									`uvm_error("Signal Order (K4)", "Error: Expected at least one valid Data Code")	
+									`uvm_error("Signal Order (K4)", $sformatf("Error: Expected at least one valid Data Code, recieved %b", rec_A))	
 									NS = state_Reset;	
 								end
 				state_D1 : 		if(is_valid_D(rec_A))begin
@@ -74,42 +74,42 @@ class scoreboard_A extends uvm_scoreboard;
 									NS = state_KK1;
 								end
 								end else begin
-									`uvm_error("Signal Order (D1)", "Error: Expected another Data Code or K.23.7")	
+									`uvm_error("Signal Order (D1)", $sformatf("Error: Expected another Data Code or K.23.7, recieved %b", rec_A))	
 									NS = state_Reset;	
 								end
 				state_KK1 : 	if(is_valid_D(rec_A))begin
 									NS = state_CRC1;
 								end 
 								else begin
-									`uvm_error("Signal Order (KK1)", "Error: Expected first CRC Packet")	
+									`uvm_error("Signal Order (KK1)", $sformatf("Error: Expected first CRC Packet, recieved %b", rec_A))	
 									NS = state_Reset;	
 								end
 				state_CRC1 : 	if(is_valid_D(rec_A))begin
 									NS = state_CRC2;
 								end 
 								else begin
-									`uvm_error("Signal Order (CRC1)", "Error: Expected second CRC Packet")	
+									`uvm_error("Signal Order (CRC1)", $sformatf("Error: Expected second CRC Packet, recieved %b", rec_A))	
 									NS = state_Reset;	
 								end
 				state_CRC2 : 	if(is_valid_D(rec_A))begin
 									NS = state_CRC3;
 								end 
 								else begin
-									`uvm_error("Signal Order (CRC2)", "Error: Expected third CRC Packet")	
+									`uvm_error("Signal Order (CRC2)", $sformatf("Error: Expected third CRC Packet, recieved %b", rec_A))	
 									NS = state_Reset;	
 								end
 				state_CRC3 : 	if(is_valid_D(rec_A))begin
 									NS = state_CRC4;
 								end 
 								else begin
-									`uvm_error("Signal Order (CRC3)", "Error: Expected fourth CRC Packet")	
+									`uvm_error("Signal Order (CRC3)", $sformatf("Error: Expected fourth CRC Packet, recieved %b", rec_A))	
 									NS = state_Reset;	
 								end
 				state_CRC4 : 	if((rec_A == 10'b0011111010) ||(rec_A == 10'b1100000101 ))begin
 									NS = state_Reset;
 								end 
 								else begin
-									`uvm_error("Signal Order (CRC4)", "Error: Expected K.28.5")	
+									`uvm_error("Signal Order (CRC4)", $sformatf("Error: Expected K.28.5, recieved %b", rec_A))	
 									NS = state_Reset;	
 								end	
 			endcase
